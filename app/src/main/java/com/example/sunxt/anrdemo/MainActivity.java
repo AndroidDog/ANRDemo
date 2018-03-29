@@ -1,9 +1,18 @@
 package com.example.sunxt.anrdemo;
 
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.graphics.Matrix;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.i(TAG, "activity pid : " + Process.myPid());
 
         // 主线程慢代码
         Button slowCodeMainThread = findViewById(R.id.btn_slow_code_main_thread);
@@ -118,8 +129,25 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
+
+        Button broadcastReceiverSlowCode = findViewById(R.id.btn_slow_code_broadcastreceiver);
+        broadcastReceiverSlowCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // broadcast receiver 慢代码
+                IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+                NetworkReceiver networkReceiver = new NetworkReceiver();
+                registerReceiver(networkReceiver, intentFilter);
+            }
+        });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
 
     private void slowCode() {
         Log.i(TAG, "slow code on main thread, start at :" + System.currentTimeMillis());
@@ -164,5 +192,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         Log.i(TAG, "io on main thread, end at :" + System.currentTimeMillis());
+    }
+
+    private class NetworkReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG, "broadcast Receiver pid: " + Process.myPid());
+            slowCode();
+//            final PendingResult pendingResult = goAsync();
+//            new AsyncTask<Integer, Integer, Integer>() {
+//                @Override
+//                protected Integer doInBackground(Integer... integers) {
+//                    slowCode();
+//                    pendingResult.finish();
+//                    return 0;
+//                }
+//            }.execute(0);
+        }
     }
 }
