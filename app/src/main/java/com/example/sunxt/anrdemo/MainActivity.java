@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         int i = 0;
         Matrix matrix = new Matrix();
         matrix.setValues(new float[]{100f, 110f, 120f, 130f, 140f, 150f, 160f, 170f, 180f});
-        while (i < Integer.MAX_VALUE) {
+        while (i++ < Integer.MAX_VALUE) {
             matrix.postRotate(30f, 10f, 10f);
         }
         Log.i(TAG, "slow code on main thread, end at :" + System.currentTimeMillis());
