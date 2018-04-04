@@ -1,6 +1,6 @@
 ﻿# Android ANR详解
 
-标签： Android ANR trace文件
+标签 ： Android ANR trace文件
 
 ---
 
